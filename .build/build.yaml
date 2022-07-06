@@ -1,0 +1,74 @@
+
+apiVersion: builds.katanomi.dev/v1alpha1
+kind: Build
+spec:
+  workspaces:
+    - description: >
+        This workspace is shared among all the pipeline tasks to read/write
+        common resources
+      name: source
+  tasks:
+    - name: build-controller
+      timeout: 30m
+      retries: 3
+      taskRef:
+        kind: ClusterTask
+        name: alauda-build-image
+      workspaces:
+        - name: source
+          workspace: source
+      params:
+        - name: container-image
+          value: build-harbor.alauda.cn/3rdparty/metallb/controller
+        - name: container-image-tag
+          value: "v0.13.4-alauda.1"
+        - name: dockerfile
+          value: ./controller/Dockerfile
+        - name: labels
+          value: []
+        - name: context
+          value: .
+        - name: build-extra-args
+          value: ""
+        - name: platform
+          value:
+            - linux/amd64
+            - linux/arm64
+        - name: tags
+          value: []
+        - name: tools-image
+          value: registry.alauda.cn:60080/devops/builder-tools:v3.8-0-g377a3f9
+        - name: verbose
+          value: "true"
+    - name: build-speaker
+      timeout: 30m
+      retries: 3
+      taskRef:
+        kind: ClusterTask
+        name: alauda-build-image
+      workspaces:
+        - name: source
+          workspace: source
+      params:
+        - name: container-image
+          value: build-harbor.alauda.cn/3rdparty/metallb/speaker
+        - name: container-image-tag
+          value: "v0.13.4-alauda.1"
+        - name: dockerfile
+          value: ./speaker/Dockerfile
+        - name: labels
+          value: []
+        - name: context
+          value: .
+        - name: build-extra-args
+          value: ""
+        - name: platform
+          value:
+            - linux/amd64
+            - linux/arm64
+        - name: tags
+          value: []
+        - name: tools-image
+          value: registry.alauda.cn:60080/devops/builder-tools:v3.8-0-g377a3f9
+        - name: verbose
+          value: "true"
