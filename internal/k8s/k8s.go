@@ -59,7 +59,7 @@ const (
 var (
 	scheme                          = runtime.NewScheme()
 	setupLog                        = ctrl.Log.WithName("setup")
-	validatingWebhookName           = "validating-webhook-configuration"
+	validatingWebhookName           = "metallb-webhook-configuration"
 	addresspoolConvertingWebhookCRD = "addresspools.metallb.io"
 	bgppeerConvertingWebhookCRD     = "bgppeers.metallb.io"
 	webhookSecretName               = "webhook-server-cert"
@@ -362,6 +362,11 @@ func enableWebhook(mgr manager.Manager, validate config.Validate, namespace stri
 
 	if err := (&metallbv1beta1.BGPAdvertisement{}).SetupWebhookWithManager(mgr); err != nil {
 		level.Error(logger).Log("op", "startup", "error", err, "msg", "unable to create webhook", "webhook", "BGPAdvertisement")
+		return err
+	}
+
+	if err := (&metallbv1beta1.L2Advertisement{}).SetupWebhookWithManager(mgr); err != nil {
+		level.Error(logger).Log("op", "startup", "error", err, "msg", "unable to create webhook", "webhook", "L2Advertisement")
 		return err
 	}
 

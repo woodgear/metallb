@@ -509,6 +509,19 @@ bool
 for a pool.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>avoidBuggyIPs</code><br/>
+<em>
+bool
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>AvoidBuggyIPs prevents addresses ending with .0 and .255
+to be used by a pool.</p>
+</td>
+</tr>
 </table>
 </td>
 </tr>
@@ -806,7 +819,10 @@ Kubernetes core/v1.SecretReference
 </td>
 <td>
 <em>(Optional)</em>
-<p>passwordSecret is name of the authentication secret for BGP Peer</p>
+<p>passwordSecret is name of the authentication secret for BGP Peer.
+the secret must be of type &ldquo;kubernetes.io/basic-auth&rdquo;, and created in the
+same namespace as the MetalLB deployment. The password is stored in the
+secret as the key &ldquo;password&rdquo;.</p>
 </td>
 </tr>
 <tr>

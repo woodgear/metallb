@@ -3,11 +3,39 @@ title: Release Notes
 weight: 8
 ---
 
-## Version 0.13.0
+## Version 0.13.4
 
 New Features:
 
-- CRD support! A long awaited feature, MetalLB is now configurable via CRs. 
+- Use cosign to sign the images ([PR 1437](https://github.com/metallb/metallb/pull/1437))
+
+Bug Fixes:
+
+- Change the validating webhook configuration name to metallb-webhook-configuration instead of validating-webhook-configuration ([PR 1497](https://github.com/metallb/metallb/pull/1497))
+- L2 mode error with ipv4 only interfaces with linklocal addresses ([Issue 1507](https://github.com/metallb/metallb/issues/1507) , [PR 1506](https://github.com/metallb/metallb/pull/1506))
+- L2 Mode: get back to announce on interfaces with no IP assigned. Vlans with no IPs should be able to advertise
+the service ([Issue 1511](https://github.com/metallb/metallb/issues/1511) [PR 1516](https://github.com/metallb/metallb/pull/1516))
+- Add the AvoidBuggyIPs flag to the IPAddressPool CRD. Converting a CIDR to a range comes with limitation related
+to setting the aggregation length and validating it. ([Issue 1495](https://github.com/metallb/metallb/issues/1495),
+[PR 1515](https://github.com/metallb/metallb/pull/1515))
+- Add a valid pem format to the CRDs webhooks instead of the empty placeholder. ([Issue 1501](https://github.com/metallb/metallb/issues/1501),
+[Issue 1521](https://github.com/metallb/metallb/issues/1521),
+[PR 1522](https://github.com/metallb/metallb/pull/1522))
+
+## Version 0.13.3
+
+Bug Fixes:
+
+- Fix images on ARM broken in 0.13.2 ([PR 1478](https://github.com/metallb/metallb/pull/1478))
+- Fail the helm release if the deprecated configinline is provided ([PR 1485](https://github.com/metallb/metallb/pull/1485))
+- Helm charts give the permissions to watch communities. This will get rid of the `Failed to watch *v1beta1.Community` log error. ([PR 1487](https://github.com/metallb/metallb/pull/1487))
+- Helm charts: add the labelselectors to the webhook service. This solves webhook issues when multiple ([PR 1487](https://github.com/metallb/metallb/pull/1487))
+
+## Version 0.13.2
+
+New Features:
+
+- CRD support! A long awaited feature, MetalLB is now configurable via CRs.
   On top of that, validating webhooks will ensure the validity of the configuration upfront, without needing to check the logs.
   ([PR #1237](https://github.com/metallb/metallb/pull/1237), [PR #1245](https://github.com/metallb/metallb/pull/1245))
   Please note that the ConfigMap configuration is not supported anymore. Check the "Changes in behaviour" section for more details.
@@ -34,7 +62,7 @@ v0.12.x version, but now the feature is covered by tests too ([PR 1444](https://
 Changes in behavior:
 
 - the biggest change is the introduction of CRDs and removing support for the configuration via ConfigMap. In order to ease the transition
-  to the new configuration, we provide a conversion tool from ConfigMap to resources (see the "Backward compatibility" section from [the main page](../_index.md)).
+  to the new configuration, we provide a conversion tool from ConfigMap to resources (see the "Backward compatibility" section from [the main page](https://metallb.universe.tf/#backward-compatibility)).
 
 - the internal architecture was radically changed in order to accomodate CRDs, so please do not hesitate to [file an issue](https://github.com/metallb/metallb/issues).
 
@@ -61,6 +89,10 @@ Bug Fixes:
 - IPV6 / FRR: fix single hop ebgp next hop tracking ([PR #1367](https://github.com/metallb/metallb/pull/1367))
 
 - Restore FRR to be pulled from dockerhub to support ARM ([PR #1258](https://github.com/metallb/metallb/pull/1258))
+
+- A race condition happening when the speaker container was slower than the frr one was fixed ([PR 1463](https://github.com/metallb/metallb/pull/1463))
+
+This release includes contributions from Andrea Panattoni, Carlos Goncalves, Federico Paolinelli, jay vyas, Joshua Carnes, liornoy, Mani Kanth, manu, Mateusz Gozdek, Mathieu Parent, Matt Layher, mkeppel@solvinity.com, Mohamed Mahmoud, Ori Braunshtein, Periyasamy Palanisamy, Rodrigo Campos, Sabina Aledort, Scott Laird, Stefan Coetzee, Tyler Auerbeck, zhoujiao. Thank you!
 
 ## Version 0.12.1
 

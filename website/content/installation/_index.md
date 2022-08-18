@@ -59,14 +59,14 @@ kubectl apply -f - -n kube-system
 To install MetalLB, apply the manifest:
 
 ```bash
-kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/main/config/manifests/metallb-native.yaml
+kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13.4/config/manifests/metallb-native.yaml
 ```
 
 {{% notice note %}}
 If you want to deploy MetalLB using the [experimental FRR mode](https://metallb.universe.tf/configuration/#enabling-bfd-support-for-bgp-sessions), apply the manifests:
 
 ```bash
-kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/main/config/manifests/metallb-frr.yaml
+kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13.4/config/manifests/metallb-frr.yaml
 ```
 
 Please do note that these manifests deploy MetalLB from the main development branch. We highly encourage cloud operators to deploy a stable released version of MetalLB on production environments!
@@ -101,7 +101,7 @@ In the following example, we are deploying MetalLB with the native bgp implement
 namespace: metallb-system
 
 resources:
-  - github.com/metallb/metallb/config/native?ref=main
+  - github.com/metallb/metallb/config/native?ref=v0.13.4
 ```
 
 In order to deploy the [experimental FRR mode](https://metallb.universe.tf/configuration/#enabling-bfd-support-for-bgp-sessions):
@@ -111,7 +111,7 @@ In order to deploy the [experimental FRR mode](https://metallb.universe.tf/confi
 namespace: metallb-system
 
 resources:
-  - github.com/metallb/metallb/config/frr?ref=main
+  - github.com/metallb/metallb/config/frr?ref=v0.13.4
 ```
 
 ## Installation with Helm
@@ -129,6 +129,21 @@ A values file may be specified on installation. This is recommended for providin
 ```bash
 helm install metallb metallb/metallb -f values.yaml
 ```
+
+{{% notice note %}}
+The speaker pod requires elevated permission in order to perform its network functionalities.
+
+If you are using MetalLB with a kubernetes version that enforces [pod security admission](https://kubernetes.io/docs/concepts/security/pod-security-admission/) (which is beta in k8s
+1.23), the namespace MetalLB is deployed to must be labelled with:
+
+```yaml
+  labels:
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/warn: privileged
+```
+
+{{% /notice %}}
 
 {{% notice note %}}
 If you want to deploy MetalLB using the [experimental FRR mode](https://metallb.universe.tf/configuration/#enabling-bfd-support-for-bgp-sessions), the following value must be set:

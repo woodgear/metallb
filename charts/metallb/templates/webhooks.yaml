@@ -1,7 +1,7 @@
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
 metadata:
-  name: validating-webhook-configuration
+  name: metallb-webhook-configuration
   labels:
     {{- include "metallb.labels" . | nindent 4 }}
 webhooks:
@@ -124,6 +124,26 @@ webhooks:
     resources:
     - bfdprofiles
   sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: metallb-webhook-service
+      namespace: {{ .Release.Namespace }}
+      path: /validate-metallb-io-v1beta1-l2advertisement
+  failurePolicy: Fail
+  name: l2advertisementvalidationwebhook.metallb.io
+  rules:
+  - apiGroups:
+    - metallb.io
+    apiVersions:
+    - v1beta1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - l2advertisements
+  sideEffects: None
 ---
 apiVersion: v1
 kind: Service
@@ -136,6 +156,7 @@ spec:
   - port: 443
     targetPort: 9443
   selector:
+    {{- include "metallb.selectorLabels" . | nindent 4 }}
     app.kubernetes.io/component: controller
 ---
 apiVersion: v1

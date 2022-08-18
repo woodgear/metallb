@@ -8,7 +8,7 @@ creating and deploying various resources into **the same namespace**
 (metallb-system) MetalLB is deployed into.
 
 There are various examples of the configuration CRs in
-[`configsamples`](https://raw.githubusercontent.com/metallb/metallb/main/configsamples).
+[`configsamples`](https://raw.githubusercontent.com/metallb/metallb/v0.13.4/configsamples).
 
 Also, the API is [fully documented here](../apis/_index.md).
 
@@ -17,7 +17,6 @@ If you installed MetalLB with Helm, you will need to change the
 namespace of the CRs to match the namespace in which MetalLB was
 deployed.
 {{% /notice %}}
-
 
 ## Defining the IPs to assign to the Load Balancer services
 
@@ -40,7 +39,7 @@ spec:
   - fc00:f853:0ccd:e799::/124
 ```
 
-Multiple instances of `IPAddressPool`s can co-exist and addresses can defined by CIDR,
+Multiple instances of `IPAddressPool`s can co-exist and addresses can be defined by CIDR,
 by range, and both IPV4 and IPV6 addresses can be assigned.
 
 ## Announce the service IPs
@@ -52,9 +51,9 @@ to announce service IPs. Jump to:
 
 - [Layer 2 configuration](#layer-2-configuration)
 - [BGP configuration](#bgp-configuration)
-- [Advanced BGP configuration](./_advanced_bgp_configuration.md)
-- [Advanced L2 configuration](./_advanced_l2_configuration.md)
-- [Advanced IPAddressPool configuration](./_advanced_ipaddresspool_configuration.md)
+- [Advanced BGP configuration](./_advanced_bgp_configuration)
+- [Advanced L2 configuration](./_advanced_l2_configuration)
+- [Advanced IPAddressPool configuration](./_advanced_ipaddresspool_config/)
 
 Note: it is possible to announce the same service both via L2 and via BGP (see the relative
 [FAQ](../faq/_index.md)).
@@ -91,6 +90,7 @@ apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
 metadata:
   name: example
+  namespace: metallb-system
 ```
 
 Setting no `IPAddressPool` selector in an `L2Advertisement` instance is interpreted
@@ -105,6 +105,7 @@ apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
 metadata:
   name: example
+  namespace: metallb-system
 spec:
   ipAddressPools:
   - first-pool
@@ -165,6 +166,7 @@ apiVersion: metallb.io/v1beta1
 kind: BGPAdvertisement
 metadata:
   name: example
+  namespace: metallb-system
 ```
 
 Setting no `IPAddressPool` selector in a `BGPAdvertisement` instance is interpreted
@@ -179,6 +181,7 @@ apiVersion: metallb.io/v1beta1
 kind: BGPAdvertisement
 metadata:
   name: example
+  namespace: metallb-system
 spec:
   ipAddressPools:
   - first-pool
@@ -213,3 +216,15 @@ spec:
   peerAddress: 172.30.0.3
   bfdProfile: testbfdprofile
 ```
+
+## Configuration validation
+
+MetalLB ships validation webhooks that check the validity of the CRs applied.
+
+However, due to the fact that the global MetalLB configuration is composed by different pieces, not all of the
+invalid configurations are blocked by those webhooks. Because of that, if a non valid MetalLB configuration
+is applied, MetalLB discards it and keeps using the last valid configuration.
+
+In future releases MetalLB will expose misconfigurations as part of Kubernetes resources,
+but currently the only way to understand why the configuration was not loaded is by checking
+the controller's logs.
