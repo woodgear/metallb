@@ -151,6 +151,7 @@ func (n *ndpResponder) processRequest() dropReason {
 }
 
 func (n *ndpResponder) advertise(dst, target net.IP, gratuitous bool) error {
+	n.logger.Log("msg", "ndp do advertise", "interface", n.intf, "dst", dst, "target", target, "gratuitous", gratuitous)
 	m := &ndp.NeighborAdvertisement{
 		Solicited:     !gratuitous, // <Adam Jensen> I never asked for this...
 		Override:      gratuitous,  // Should clients replace existing cache entries

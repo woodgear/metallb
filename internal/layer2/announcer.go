@@ -191,13 +191,17 @@ func (a *Announce) gratuitous(ip net.IP) {
 	}
 
 	if ip.To4() != nil {
+		a.logger.Log("msg", "do arp", "ip", ip, "len", len(a.arps))
 		for _, client := range a.arps {
+			a.logger.Log("msg", "do arp", "ip", ip, "inc", client.intf)
 			if err := client.Gratuitous(ip); err != nil {
 				level.Error(a.logger).Log("op", "gratuitousAnnounce", "error", err, "ip", ip, "msg", "failed to make gratuitous ARP announcement")
 			}
 		}
 	} else {
+		a.logger.Log("msg", "do ndp", "ip", ip, "len", len(a.ndps))
 		for _, client := range a.ndps {
+			a.logger.Log("msg", "do ndp", "ip", ip, "inc", client.intf)
 			if err := client.Gratuitous(ip); err != nil {
 				level.Error(a.logger).Log("op", "gratuitousAnnounce", "error", err, "ip", ip, "msg", "failed to make gratuitous NDP announcement")
 			}

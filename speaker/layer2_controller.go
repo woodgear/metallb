@@ -123,9 +123,10 @@ func (c *layer2Controller) ShouldAnnounce(l log.Logger, name string, toAnnounce 
 
 		return bytes.Compare(hi[:], hj[:]) < 0
 	})
-
+	isme := len(nodes) > 0 && nodes[0] == c.myNode
+	l.Log("event", "select owner", "isme", isme, "nodes", nodes, "ip", ipString, "mynode", c.myNode)
 	// Are we first in the list? If so, we win and should announce.
-	if len(nodes) > 0 && nodes[0] == c.myNode {
+	if isme {
 		return ""
 	}
 
