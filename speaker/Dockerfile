@@ -44,13 +44,14 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
   -ldflags "-X 'go.universe.tf/metallb/internal/version.gitCommit=${GIT_COMMIT}' -X 'go.universe.tf/metallb/internal/version.gitBranch=${GIT_BRANCH}'" \
   go.universe.tf/metallb/speaker
 
-FROM docker.io/alpine:latest
+FROM build-harbor.alauda.cn/ops/alpine:3.16
 
-
+RUN apk add --no-cache libcap su-exec  && rm /usr/bin/nc
 COPY --from=builder /build/speaker /speaker
 COPY --from=builder /build/frr-metrics /frr-metrics
 COPY frr-reloader/frr-reloader.sh /frr-reloader.sh
 COPY LICENSE /
+RUN setcap cap_net_raw+ep /speaker && getcap /speaker
 
 LABEL org.opencontainers.image.authors="metallb" \
   org.opencontainers.image.url="https://github.com/metallb/metallb" \
@@ -60,6 +61,6 @@ LABEL org.opencontainers.image.authors="metallb" \
   org.opencontainers.image.licenses="Apache-2.0" \
   org.opencontainers.image.description="Metallb speaker" \
   org.opencontainers.image.title="speaker" \
-  org.opencontainers.image.base.name="docker.io/alpine:latest"
-
+  org.opencontainers.image.base.name="build-harbor.alauda.cn/ops/alpine:3.16"
+USER nonroot
 ENTRYPOINT ["/speaker"]

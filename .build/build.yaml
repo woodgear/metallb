@@ -8,7 +8,25 @@ spec:
         common resources
       name: source
   tasks:
+    - name: version
+      timeout: 5m
+      retries: 1
+      workspaces:
+        - name: source
+          workspace: source
+      taskRef:
+        kind: ClusterTask
+        name: alauda-generate-version
+      params:
+        - name: repo-type
+          value: gitlab
+        - name: repo-url
+          value: $(params.git-url)
+        - name: repo-ref
+          value: $(params.git-revision)
     - name: build-controller
+      runAfter:
+        - version
       timeout: 30m
       retries: 3
       taskRef:
@@ -21,7 +39,7 @@ spec:
         - name: container-image
           value: build-harbor.alauda.cn/3rdparty/metallb/controller
         - name: container-image-tag
-          value: "v0.13.4-alauda.1"
+          value: "v0.13.4-alauda.$(tasks.version.results.timestamp)"
         - name: dockerfile
           value: ./controller/Dockerfile
         - name: labels
@@ -41,6 +59,8 @@ spec:
         - name: verbose
           value: "true"
     - name: build-speaker
+      runAfter:
+        - version
       timeout: 30m
       retries: 3
       taskRef:
@@ -53,7 +73,7 @@ spec:
         - name: container-image
           value: build-harbor.alauda.cn/3rdparty/metallb/speaker
         - name: container-image-tag
-          value: "v0.13.4-alauda.1"
+          value: "v0.13.4-alauda.$(tasks.version.results.timestamp)"
         - name: dockerfile
           value: ./speaker/Dockerfile
         - name: labels
